@@ -187,13 +187,35 @@ md_change |>
     caption = "Changes in Key Indicators by Maryland County (2019–2022)",
     col.names = c("County", "Population Change", "% Population Change",
                   "Income Change ($)", "Employment Change"),
-    align = c("l", "l", "l", "l", "l")
+    align = "lllll"
   ) |>
-  kable_classic(lightable_options = "striped")
+  kable_classic(lightable_options = "striped") |>
+  save_kable("md_key_indicators.html")
 
 # Create visualization:
+plot_1 <- ggplot(md_change, aes(x = reorder(NAME, income_change), y = income_change)) +
+  geom_col(fill = "darkgreen") +
+  coord_flip() +
+  labs(
+    title = "Change in Median Household Income (Maryland Counties, 2019–2022)",
+    x = "County",
+    y = "Income Change ($)"
+  ) +
+  scale_y_continuous(labels = dollar) +
+  theme_minimal()
 
+plot_2 <- ggplot(md_change, aes(x = reorder(NAME, pop_pct_change), y = pop_pct_change)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Population Percent Change (Maryland Counties, 2019–2022)",
+    x = "County",
+    y = "Percent Change"
+  ) +
+  theme_minimal()
 
+ggsave("md_household_income.png", plot = plot_1)
+ggsave("md_pop_change.png", plot = plot_2)
 
 # Small data analysis:
 
