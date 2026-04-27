@@ -9,7 +9,7 @@ effectively we work as a team to hopefully be hired by Big Data, Inc. (Imaginary
 As stated previously, Our main goal is to create a GitHub repository that 
 functions as a central collaboration environment. However, our goal for this project 
 is to perform data wrangling and exploratory data analysis, using the tools we 
-learned over the course of STAT 184, on the US Census Bureau data.Using the 
+learned over the course of STAT 184, on the US Census Bureau data. Using the 
 `tidycensus` package in R, we want to explore the following question(s):
 
 - How did key demographic and economic indicators (such as population, median income, and employment) change across Maryland between 2019 and 2022?
