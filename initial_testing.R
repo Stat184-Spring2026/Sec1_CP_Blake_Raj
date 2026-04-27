@@ -1,3 +1,5 @@
+# Initial testing of {tidycensus} ----
+
 # install.packages("tidycensus")
 
 # Load libraries for getting data
@@ -102,3 +104,97 @@ vt <- get_acs(geography = "county",
               year = 2021)
 
 vt
+
+# Blake's Tests on {tidycensus} ----
+
+# Get data:
+
+## Load packages:
+library(tidycensus)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+library(scales)
+
+options(tigris_use_cache = TRUE)
+
+## Set the Census API key
+census_api_key("6377fd44a462d589653004510dcef417f2f8aabb", overwrite = TRUE, install = TRUE)
+
+## Set variables for census data filtering:
+vars <- c(
+  population = "B01003_001",
+  median_income = "B19013_001",
+  employed = "B23025_004"
+)
+
+## Get Maryland data from 2019 and 2022 (ACS 5-year estimates)
+md_2019 <- get_acs(
+  geography = "county",
+  state = "MD",
+  variables = vars,
+  year = 2019,
+  output = "wide"
+  ) |>
+  mutate(year = 2019)
+
+md_2022 <- get_acs(
+  geography = "county",
+  state = "MD",
+  variables = vars,
+  year = 2022,
+  output = "wide"
+  ) |>
+  mutate(year = 2022)
+
+## Bind both years together into one data frame
+md_all <- bind_rows(md_2019, md_2022)
+
+## Tidy data frame:
+md_clean <- md_all |>
+  select(GEOID, NAME, year, population = populationE, income = median_incomeE, 
+         income_moe = median_incomeM, employed = employedE, employed_moe = employedM) |>
+  arrange(NAME, year) |>
+  mutate(NAME = str_remove(NAME, ",\\s*.*$"))
+
+## Change and add to data frame
+md_change <- md_clean |>
+  pivot_wider(
+    names_from = year,
+    values_from = c(population, income, income_moe, employed, employed_moe)
+  ) |>
+  mutate(
+    pop_change = population_2022 - population_2019,
+    income_change = income_2022 - income_2019,
+    employed_change = employed_2022 - employed_2019,
+    pop_pct_change = pop_change / population_2019 * 100
+  ) |>
+  arrange(desc(pop_pct_change))
+
+# Create table:
+
+md_change |>
+  mutate(
+    pop_change = comma(pop_change),
+    income_change = dollar(income_change),
+    employed_change = comma(employed_change),
+    pop_pct_change = round(pop_pct_change, 2)
+  ) |>
+  select(NAME, pop_change, pop_pct_change, income_change, employed_change) |>
+  kable(
+    caption = "Changes in Key Indicators by Maryland County (2019–2022)",
+    col.names = c("County", "Population Change", "% Population Change",
+                  "Income Change ($)", "Employment Change"),
+    align = c("l", "l", "l", "l", "l")
+  ) |>
+  kable_classic(lightable_options = "striped")
+
+# Create visualization:
+
+
+
+# Small data analysis:
+
+
