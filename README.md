@@ -1,4 +1,4 @@
-# Project Title
+# Stat 184 Course Project: U.S. Census Bureau, Maryland Data Analysis (2019–2022)
 
 This repo is for STAT 184's final course project. Our goal is to create a GitHub 
 repository that functions as a central collaboration environment to show how 
