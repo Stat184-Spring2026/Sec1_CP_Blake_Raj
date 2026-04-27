@@ -1,0 +1,97 @@
+---
+title: "CP Analysis Report: US Census Bureau Analysis"
+subtitle: "Stat 184"
+author:
+  - name: Blake Naluai
+  - name: Raj Ramnani
+date: "Apr. 24, 2026"
+date-modified: now
+
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    code-fold: true
+
+# add bib and csl info if needed on quarto document
+# bibliography: temp.bib
+# csl: apa.csl
+---
+
+{{< pagebreak >}}
+
+# This is a test document for our analysis.
+
+# Data Provenance:
+
+In this analysis project, we will be working with the \{tidycensus\} package in R. This package in R is designed to make it easy to access US Census data. Firstly, it connects directly to the US Census Bureau API with and API Key given directly to you by the US Census Bureau. Using that key, it will return data in a format that is compatible with \{tidyverse\}. (i.e data frames that can be wrangled, cleaned, and easily used for data analysis). 
+
+## Where the data comes from: 
+
+All data accessed through \{tidycensus\} comes from the following:
+
+**Decennial Census**
+
+- Conducted every 10 years (e.g., 2010, 2020)
+- Attempts to count every person in the U.S.
+- Collects basic info: age, sex, race, household relationships, etc
+
+**American Community Survey (ACS)**
+
+- A continuous survey
+- Provides detailed socioeconomic data of the US
+
+## Who collected it?
+
+The US Census Bureau (Department of Commerce)
+
+## Why was it collected?
+
+- Allocate federal funding
+- Determine political representation
+- Support research, planning, and policy decisions
+
+## How is it collected?
+
+**Decennial Census**
+
+- Mail forms, online responses, in-person follow-ups
+- Aims for a complete count
+
+**American Community Survey (ACS)**
+
+- Uses sampling, not a full count
+- About 3–3.5 million households per year are surveyed (randomly selected)
+
+Random sampling survey techniques include:
+
+- mail surveys
+- phone interviews
+- in-person follow-ups
+
+## When was it collected?
+
+**Decennial Census**
+
+- Every 10 years (i.e 2020)
+
+**American Community Survey (ACS)**
+
+- Conducted continuously every year since 2005
+- Data is released as 1-year estimates (large populations) or 5-year estimates (smaller, more reliable populations)
+
+For this analysis, we will be using **Insert data here** to answer the following question(s):
+
+**EDA Question(s) here**
+
+{{< pagebreak >}}
+
+# Code Appendix
+```{r}
+#| label: codeAppend
+#| ref-label: !expr knitr::all_labels()
+#| echo: true
+#| eval: false
+
+```
