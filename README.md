@@ -10,7 +10,7 @@ As stated previously, Our main goal is to create a GitHub repository that
 functions as a central collaboration environment. However, our goal for this project 
 is to perform data wrangling and exploratory data analysis, using the tools we 
 learned over the course of STAT 184, on the US Census Bureau data.Using the 
-\{tidycensus\} package in R, we want to explore the following question(s):
+`tidycensus` package in R, we want to explore the following question(s):
 
 - How did key demographic and economic indicators (such as population, median income, and employment) change across Maryland between 2019 and 2022?
 - How did population size and density change across counties surrounding St.Marys, MD between 2019 and 2022?
@@ -33,7 +33,7 @@ For package details, see:
 
 ## Current Plan
 
-Current plans can be viewed in the insert_docx_name_here.docx.
+Current plans can be viewed in the `insert_docx_name_here.docx`.
 
 ## Repo Structure
 
