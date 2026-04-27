@@ -10,7 +10,7 @@ library(tidyverse)
 census_api_key("6377fd44a462d589653004510dcef417f2f8aabb", overwrite = TRUE, install = TRUE)
 
 # Load all variables that can be used to make list of possible data
-v2010 <- load_variables(2010, "acs1")
+v2010 <- load_variables(2010, "acs5")
 View(v2010)
 
 ### List of important variables for data set:
@@ -95,10 +95,10 @@ US_Census_Raw <- get_acs(
 #' 
 #' This is in long format and can thus be wrangled for better statistical use.
 
-# Wrangle the data a bit:
-US_Census_Tidy <- US_Census_Raw |>
-  pivot_wider(
-    id_cols = c(GEOID, NAME),
-    names_from = variable,
-    values_from = c(estimate, moe)
-  )
+vt <- get_acs(geography = "county", 
+              variables = c(col_age_18_to_19 = "B01001A_007", col_age_20_to_24="B01001A_008"),
+              state="PA",
+              county=c("Clinton County", "Clearfield County", "Centre County", "Huntingdon County", "Blair County", "Mifflin County"),
+              year = 2021)
+
+vt
