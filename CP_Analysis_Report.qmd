@@ -21,13 +21,11 @@ format:
 
 {{< pagebreak >}}
 
-# This is a test document for our analysis.
-
-# Data Provenance:
+## Data Provenance:
 
 In this analysis project, we will be working with the \{tidycensus\} package in R. This package in R is designed to make it easy to access US Census data. Firstly, it connects directly to the US Census Bureau API with and API Key given directly to you by the US Census Bureau. Using that key, it will return data in a format that is compatible with \{tidyverse\}. (i.e data frames that can be wrangled, cleaned, and easily used for data analysis). 
 
-## Where the data comes from: 
+### Where the data comes from: 
 
 All data accessed through \{tidycensus\} comes from the following:
 
@@ -42,17 +40,17 @@ All data accessed through \{tidycensus\} comes from the following:
 - A continuous survey
 - Provides detailed socioeconomic data of the US
 
-## Who collected it?
+### Who collected it?
 
 The US Census Bureau (Department of Commerce)
 
-## Why was it collected?
+### Why was it collected?
 
 - Allocate federal funding
 - Determine political representation
 - Support research, planning, and policy decisions
 
-## How is it collected?
+### How is it collected?
 
 **Decennial Census**
 
@@ -70,7 +68,7 @@ Random sampling survey techniques include:
 - phone interviews
 - in-person follow-ups
 
-## When was it collected?
+### When was it collected?
 
 **Decennial Census**
 
@@ -81,13 +79,22 @@ Random sampling survey techniques include:
 - Conducted continuously every year since 2005
 - Data is released as 1-year estimates (large populations) or 5-year estimates (smaller, more reliable populations)
 
-For this analysis, we will be using **Insert data here** to answer the following question(s):
+For this analysis, we will be using the American Community Survey (ACS) data from the US Census Bureau to answer the following question(s):
 
-**EDA Question(s) here**
+- How did key demographic and economic indicators (such as population, median income, and employment) change across Maryland between 2019 and 2022?
+- How did population size and density change across counties surrounding St.Marys, MD between 2019 and 2022?
 
 {{< pagebreak >}}
 
-# Code Appendix
+## Data Tables/Visualizations:
+
+{{< pagebreak >}}
+
+## Data Analysis:
+
+{{< pagebreak >}}
+
+## Code Appendix
 ```{r}
 #| label: codeAppend
 #| ref-label: !expr knitr::all_labels()
