@@ -33,11 +33,21 @@ For package details, see:
 
 ## Current Plan
 
-Current plans can be viewed in the `insert_docx_name_here.docx`.
+Current plans can be viewed in the `Initial_Plan_for_STAT_184_Final_Project.docx`.
+
+Additional plans for data analysis, data visualizations, and more can be found in the following:
+
+- `insert_file_name_here.docx`
+- `insert_file_name_here.docx`
+- `insert_file_name_here.docx`
+- `CP_Analysis_Report.qmd`
 
 ## Repo Structure
 
-Update as project goes along.
+This repo is of simple organization. Most files live at the top level. 
+There is an sub-directory, images, which has static image files.
+
+Repo structure is prone to change as we continue with the project.
 
 ## Authors
 
