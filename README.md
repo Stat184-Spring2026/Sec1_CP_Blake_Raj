@@ -1,28 +1,54 @@
-# Project Title
+# Stat 184 Course Project: U.S. Census Bureau, Maryland Data Analysis (2019–2022)
 
-Write a 1-2 sentences that quickly and clearly convey what your repo is for.
+This repo is for STAT 184's final course project. Our goal is to create a GitHub 
+repository that functions as a central collaboration environment to show how 
+effectively we work as a team to hopefully be hired by Big Data, Inc. (Imaginary Company)
 
 ## Overview
 
-Expand on those introductory sentences with a brief but informative description of your project's purpose and goals. This section should help visitors decide whether they should dig deeper into your repo/project.
+As stated previously, Our main goal is to create a GitHub repository that 
+functions as a central collaboration environment. However, our goal for this project 
+is to perform data wrangling and exploratory data analysis, using the tools we 
+learned over the course of STAT 184, on the US Census Bureau data. Using the 
+`tidycensus` package in R, we want to explore the following question(s):
+
+- How did key demographic and economic indicators (such as population, median income, and employment) change across Maryland between 2019 and 2022?
+- How did population size and density change across counties surrounding St.Marys, MD between 2019 and 2022?
 
 ### Interesting Insight (Optional)
 
-This is optional but highly recommended. You'll include one interesting insight from your project as part of the README. This insight is most effective when you include a visual. Keep in mind that this visual must be included as an image file (e.g., JPG, PNG, etc.). You can export plots created with `{ggplot2}` by using the function `ggsave`.
+This will be updated as we go throughout the course project.
 
 ## Data Sources and Acknowledgements
 
-Be sure to list where you got any data used within the project. Be sure to acknowledge any one whose work or elements you're drawing upon.
+We used one major source of data:
+
+- Data source: U.S. Census Bureau, American Community Survey (ACS) 5-year estimates  
+- Accessed via: R package `tidycensus` by Kyle Walker and contributors  
+
+For package details, see:
+
+- [tidycensus citation details](https://cran.r-project.org/package=tidycensus)
+- [tidycensus package additional info](https://walker-data.com/tidycensus/index.html)
 
 ## Current Plan
 
-Provide some information about what you intend to do with the project. You can additionally refer the visitor to your detailed plan document.
+Current plans can be viewed in the `Initial_Plan_for_STAT_184_Final_Project.docx` 
+in the `planning documents` folder.
+
+Additional plans for data analysis, data visualizations, and more can be found 
+in the `planning documents` folder as well as `CP_Analysis_Report.qmd`.
 
 ## Repo Structure
 
-Use this section to explain the structure of your repo. This should help visitors quickly figure out where they should look to find certain elements. Further, you can use this space to highlight and briefly explain important/key files in the repo.
+This repo is of simple organization. Most files live at the top level. 
+There is an sub-directory, images, which has static image files.
 
+Repo structure is prone to change as we continue with the project.
 
 ## Authors
 
-Give information about who are the authors of the project and how people can get in touch if they have questions.
+The author(s) are:
+
+- Blake Naluai; [email](bkn5189@psu.edu).
+- Raj Ramnani; [email](rxr5645@psu.edu).
