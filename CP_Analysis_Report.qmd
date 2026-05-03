@@ -7,12 +7,7 @@ author:
 date: "Apr. 24, 2026"
 date-modified: now
 
-format: 
-  html:
-    toc: true
-    toc-depth: 3
-    number-sections: false
-    code-fold: true
+format: pdf
 
 # add bib and csl info if needed on quarto document
 # bibliography: temp.bib
@@ -20,6 +15,12 @@ format:
 ---
 
 {{< pagebreak >}}
+
+## Introduction
+
+The U.S. Census Bureau provides some of the most widely used public data for understanding demographic, economic, and social change in the United States. For this project, we use data accessed through the `{tidycensus}` package in R to examine how selected county-level indicators changed in Maryland around the COVID-19 period, especially from 2019 to 2022. This period is important because it includes major disruptions to work, commuting, income, housing, and household behavior.
+
+Our analysis focuses on Maryland counties using American Community Survey (ACS) 1-year and 5-year estimates, as well as the Decennial Census. We use this information to make tables, plots, and narratives explaining some of the changes that have appeared in the state, and across its counties. 
 
 ## Data Provenance:
 
