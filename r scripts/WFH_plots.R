@@ -81,4 +81,9 @@ wfh_plot <- wfh_avg_plot_data |>
   ) +
   theme_minimal()
 
+# Narrative:
+# The work-from-home visualization shows a clear and consistent increase in the
+# average share of Maryland county workers working from home from 2019 through 2022.
+# This shows that remote work became much more common during this period,
+# reflecting major world-wide changes consistent with the social distancing requirements.
 wfh_plot
