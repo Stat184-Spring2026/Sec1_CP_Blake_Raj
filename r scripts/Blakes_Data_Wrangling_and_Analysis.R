@@ -8,6 +8,7 @@ library(ggplot2)
 library(knitr)
 library(kableExtra)
 library(scales)
+library(esquisse)
 
 options(tigris_use_cache = TRUE)
 
@@ -118,10 +119,40 @@ md_clean <- md_all |>
   arrange(County, year)
 
 ## Create Data Table
+md_table <- md_clean |>
+  mutate(
+    unemployment_rate = percent(unemployment_rate, accuracy = 0.01),
+    pct_wfh = percent(pct_wfh, accuracy = 0.01),
+    pct_internet = percent(pct_internet, accuracy = 0.01),
+    rent_burden = percent(rent_burden, accuracy = 0.01),
+    pct_65_plus = percent(pct_65_plus, accuracy = 0.01),
+    median_income = dollar(median_income)
+  ) |>
+  select(
+    "Maryland County" = County,
+    "Year" = year,
+    "Median Income" = median_income,
+    "% Working From Home" = pct_wfh,
+    "% Households with Internet" = pct_internet,
+    "30%+ Renters Burden" = rent_burden,
+    "% Population 65+" = pct_65_plus,
+    "% Unemployed" = unemployment_rate
+  ) |>
+  kable(
+  caption = "Maryland County Socioeconomic Indicators (2019–2022)"
+  ) |>
+  kable_classic(
+    lightable_options = "striped"
+  )
 
+md_table
 
 ## Create Data Visualization
 
+esquisser(
+  data = md_clean,
+  viewer = "browser" # Opens the tool up in your default browser instead of RStudio
+)
 
 ## (Optional) Data Analysis/Narrative Text
 
