@@ -17,7 +17,9 @@ learned over the course of STAT 184, on the US Census Bureau data. Using the
 
 ### Interesting Insight (Optional)
 
-This will be updated as we go throughout the course project.
+- One interesting insight is that counties with high internet access saw the largest 
+increases in remote work from 2019 to 2022, suggesting the infrastructure was 
+already in place but only widely utilized after the pandemic.
 
 ## Data Sources and Acknowledgements
 
@@ -42,9 +44,11 @@ in the `planning documents` folder as well as `CP_Analysis_Report.qmd`.
 ## Repo Structure
 
 This repo is of simple organization. Most files live at the top level. 
-There is an sub-directory, images, which has static image files.
+There are three sub-directores:
 
-Repo structure is prone to change as we continue with the project.
+- `images`: contains static image files.
+- `planning documents`: contains .docx files with project plans
+- `r scripts`: contains all r scripts for personal-testing and project use.
 
 ## Authors
 
