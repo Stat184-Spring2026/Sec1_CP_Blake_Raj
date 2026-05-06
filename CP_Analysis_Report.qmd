@@ -7,6 +7,10 @@ author:
 date: "Apr. 24, 2026"
 date-modified: now
 format: pdf
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 csl: apa7.csl
 bibliography: citations.bib
 ---
@@ -114,6 +118,11 @@ The *constructed/derived* attributes we will be focusing on for this project are
 - Percentage of households with internet access
 - Rent burden rate (share of renters spending 30%+ on rent)
 - Percentage of population age 65 and older
+<<<<<<< Updated upstream
+=======
+- How did key demographic and economic indicators (such as population, median income, and employment) change across Maryland between 2019 and 2022?
+- How did population size and density change across counties surrounding St.Marys, MD between 2019 and 2022?
+>>>>>>> Stashed changes
 
 {{< pagebreak >}}
 
@@ -424,6 +433,13 @@ Overall, @fig-mdFig1 indicates that increases in remote work from 2019 to 2022 a
 
 ```
 
+<<<<<<< Updated upstream
 {{< pagebreak >}}
 
 # References:
+=======
+
+{{< pagebreak >}}
+
+# References:
+>>>>>>> Stashed changes
