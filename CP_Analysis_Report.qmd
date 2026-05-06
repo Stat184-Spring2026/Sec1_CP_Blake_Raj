@@ -2,16 +2,13 @@
 title: "CP Analysis Report: US Census Bureau Analysis"
 subtitle: "Stat 184"
 author:
-  - name: Blake Naluai
-  - name: Raj Ramnani
+  - Blake Naluai
+  - Raj Ramnani
 date: "Apr. 24, 2026"
 date-modified: now
-
 format: pdf
-
-# add bib and csl info if needed on quarto document
-# bibliography: temp.bib
-# csl: apa.csl
+csl: apa7.csl
+bibliography: citations.bib
 ---
 
 {{< pagebreak >}}
@@ -82,16 +79,339 @@ Random sampling survey techniques include:
 
 For this analysis, we will be using the American Community Survey (ACS) data from the US Census Bureau to answer the following question(s):
 
-- How did key demographic and economic indicators (such as population, median income, and employment) change across Maryland between 2019 and 2022?
-- How did population size and density change across counties surrounding St.Marys, MD between 2019 and 2022?
+-	How is the rise of remote work associated with income, internet access, and rent burden across Maryland counties from 2019-2022?
+-	Are Maryland counties with larger elderly populations (65+) experiencing higher economic strain from 2019-2022?
+-	How did Income Inequality change, as measured by the Gini Index, during the periods of 2019-2022?
+-	How did the number of people working from home change during the COVID-19 Pandemic?
+-	etc.
+
+## FAIR/CARE Principles:
+
+The \{tidycensus\} package and the U.S. Census data it accesses align closely with both the FAIR and CARE principles for responsible data use. In terms of FAIR, the data is highly findable, as each variable is assigned a unique identifier (such as `B19013_001` for median income) and can be easily located using tools like `load_variables()`. It is also accessible, since the Census Bureau provides open access through an API that can be queried directly in R with minimal barriers. The data is inter-operable because it is delivered in consistent, standardized formats that integrate seamlessly with tools in the tidyverse, allowing for efficient data wrangling and analysis. Additionally, it is reusable, as the Census provides thorough documentation and maintains consistent variable definitions across years, enabling reliable longitudinal studies like the 2019–2022 county-level analysis conducted here.
+
+From a CARE perspective, Census data supports collective benefit by being publicly available for research, policy, and social understanding. While individual-level control over data use is limited, the Census Bureau maintains privacy protections, addressing authority to control. Ethical considerations are supported through the use of aggregated, de-identified data, though we must still be mindful when analyzing demographic patterns to avoid harmful generalizations.
+
+## Variables:
+
+The *raw* attributes we will be focusing on for this project are:
+
+- County
+- Year
+- Total population
+- Total households
+- Total renter-occupied households
+- Median household income
+- Labor force (population in labor force)
+- Total workers (commuting / work status)
+- Number of unemployed individuals
+- Number of people working from home
+- Households with internet access
+
+The *constructed/derived* attributes we will be focusing on for this project are:
+
+- Unemployment rate
+- Percentage of workers working from home
+- Percentage of households with internet access
+- Rent burden rate (share of renters spending 30%+ on rent)
+- Percentage of population age 65 and older
 
 {{< pagebreak >}}
 
 ## Data Tables/Visualizations:
 
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# Load Packages and API key
+library(tidycensus)
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+library(scales)
+library(esquisse)
+
+options(tigris_use_cache = TRUE) # permanently store census shapefiles
+
+## Set the Census API key
+invisible(census_api_key("6377fd44a462d589653004510dcef417f2f8aabb", 
+                         overwrite = TRUE, install = TRUE))
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: wrangleMDData1
+
+## Set variables
+vars <- c(
+  # Population
+  total_population = "B01003_001",
+  # Households
+  total_households = "B11001_001",
+  # Renter-occupied households with income
+  renter_occupied_households = "B25070_001",
+  # Income
+  median_income = "B19013_001",
+  # Employment
+  labor_force = "B23025_003",
+  total_workers = "B08301_001",
+  unemployed = "B23025_005",
+  # Remote work (work from home)
+  work_from_home = "B08301_021",
+  # Internet access (household has any internet subscription)
+  internet_access = "B28002_002",
+  # Rent burden (30%+ of income, sum these)
+  rent_30_34 = "B25070_007",
+  rent_35_39 = "B25070_008",
+  rent_40_49 = "B25070_009",
+  rent_50_plus = "B25070_010",
+  # Age 65+ (we will sum these)
+  male_65_66 = "B01001_020",
+  male_67_69 = "B01001_021",
+  male_70_74 = "B01001_022",
+  male_75_79 = "B01001_023",
+  male_80_84 = "B01001_024",
+  male_85_plus = "B01001_025",
+  female_65_66 = "B01001_044",
+  female_67_69 = "B01001_045",
+  female_70_74 = "B01001_046",
+  female_75_79 = "B01001_047",
+  female_80_84 = "B01001_048",
+  female_85_plus = "B01001_049"
+)
+
+## Get data for each year
+md_2019 <- get_acs(
+  geography = "county",
+  state = "MD",
+  variables = vars,
+  year = 2019,
+  output = "wide"
+) |>
+  mutate(year = 2019)
+
+md_2022 <- get_acs(
+  geography = "county",
+  state = "MD",
+  variables = vars,
+  year = 2022,
+  output = "wide"
+) |>
+  mutate(year = 2022)
+
+## Bind DF's
+md_all <- bind_rows(md_2019, md_2022)
+
+## Tidy DF
+md_clean <- md_all |>
+  mutate(
+    age_65_plus = male_65_66E + male_67_69E + male_70_74E + male_75_79E + 
+      male_80_84E + male_85_plusE + female_65_66E + female_67_69E + female_70_74E + 
+      female_75_79E + female_80_84E + female_85_plusE,
+    rent_30_plus = rent_30_34E + rent_35_39E + rent_40_49E + rent_50_plusE
+  ) |>
+  select(
+    County = NAME,
+    year,
+    total_population = total_populationE,
+    total_households = total_householdsE,
+    total_renter_occ_households = renter_occupied_householdsE,
+    median_income = median_incomeE,
+    labor_force = labor_forceE,
+    total_workers_commute = total_workersE,
+    unemployed = unemployedE,
+    work_from_home = work_from_homeE,
+    household_internet_access = internet_accessE,
+    rent_30_plus,
+    age_65_plus
+  ) |>
+  mutate(
+    County = str_remove(County, ",\\s*.*$"),
+    # Unemployment rate
+    unemployment_rate = unemployed / labor_force,
+    # % Working from home (proxy)
+    pct_wfh = work_from_home / total_workers_commute,
+    # Internet access rate
+    pct_internet = household_internet_access / total_households,
+    # Rent burden (30%+)
+    rent_burden = rent_30_plus / total_renter_occ_households,
+    # % Age 65+
+    pct_65_plus = age_65_plus / total_population
+  ) |>
+  arrange(County, year)
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-md2019Table1
+#| tbl-cap: "Maryland County Socioeconomic Indicators (2019)"
+
+md_clean |>
+  mutate(
+    unemployment_rate = percent(unemployment_rate, accuracy = 0.01),
+    pct_wfh = percent(pct_wfh, accuracy = 0.01),
+    pct_internet = percent(pct_internet, accuracy = 0.01),
+    rent_burden = percent(rent_burden, accuracy = 0.01),
+    pct_65_plus = percent(pct_65_plus, accuracy = 0.01),
+    median_income = dollar(median_income)
+  ) |>
+  filter(
+    year == 2019
+  ) |>
+  select(
+    "County" = County,
+    "Median\nIncome" = median_income,
+    "% WFH" = pct_wfh,
+    "% Internet" = pct_internet,
+    "Rent Burden" = rent_burden,
+    "% Age 65+" = pct_65_plus,
+    "% Unemp." = unemployment_rate
+  ) |>
+  kable(
+  caption = "Maryland County Socioeconomic Indicators (2019)"
+  ) |>
+  kable_classic(
+    lightable_options = "striped"
+  ) |>
+  kable_styling(
+    latex_options = "scale_down",
+    font_size = 9
+  )
+
+```
+
+{{< pagebreak >}}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-md2022Table1
+#| tbl-cap: "Maryland County Socioeconomic Indicators (2022)"
+
+md_clean |>
+  mutate(
+    unemployment_rate = percent(unemployment_rate, accuracy = 0.01),
+    pct_wfh = percent(pct_wfh, accuracy = 0.01),
+    pct_internet = percent(pct_internet, accuracy = 0.01),
+    rent_burden = percent(rent_burden, accuracy = 0.01),
+    pct_65_plus = percent(pct_65_plus, accuracy = 0.01),
+    median_income = dollar(median_income)
+  ) |>
+  filter(
+    year == 2022
+  ) |>
+  select(
+    "County" = County,
+    "Median\nIncome" = median_income,
+    "% WFH" = pct_wfh,
+    "% Internet" = pct_internet,
+    "Rent Burden" = rent_burden,
+    "% Age 65+" = pct_65_plus,
+    "% Unemp." = unemployment_rate
+  ) |>
+  kable(
+    caption = "Maryland County Socioeconomic Indicators (2022)"
+  ) |>
+  kable_classic(
+    lightable_options = "striped"
+  ) |>
+  kable_styling(
+    latex_options = "scale_down",
+    font_size = 9
+  )
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-mdFig1
+#| fig-width: 7
+#| fig-height: 4
+#| fig-pos: H
+#| fig-cap: "Remote Work, Connectivity, Income, and Age Across Maryland Counties"
+#| fig-cap-location: top
+#| fig-alt: "Scatter plot showing remote work trends, internet access, income, and aging in Maryland counties for 2019 and 2022."
+
+md_clean |>
+ggplot(
+  mapping = aes(
+    x = pct_internet,
+    y = pct_wfh,
+    size = pct_65_plus,
+    color = median_income
+    )
+  ) +
+  geom_point(alpha = 1) +
+  facet_wrap(~year) +
+  scale_x_continuous(labels = percent_format()) +
+  scale_y_continuous(labels = percent_format()) +
+  labs(
+    caption = "US Census Data from 2019-2022",
+    x = "% Internet Access",
+    y = "% Working From Home",
+    size = "% Age 65+",
+    color = "Median Income"
+  ) +
+  theme_bw()
+
+```
+
+Long Description: The image is a comparative scatter plot divided into two panels, presenting data from 2019 and 2022 on remote work, internet access, income, and aging across Maryland counties. Each panel displays county data points represented as circles, plotted according to "% Internet Access" on the x-axis and "% Working From Home" on the y-axis. The size of each circle indicates the percentage of the population aged 65 or older, with larger circles representing higher percentages. Color gradients from dark to light blue depict median income levels, ranging from 40,000 to 140,000. In 2019, data points concentrate at lower working-from-home and internet access percentages, while in 2022, the distribution shifts upwards, indicating an increase in remote work and internet access. We used the tidycensus package [@walker_tidycensus] and {ggplot2} to create this visualization.
+
+(The long description and alt text was produced by ASU-EdPlus-Image-Detail-Tool [@asu] on 5/5/2026)
+
 {{< pagebreak >}}
 
 ## Data Analysis:
+
+#### Exploring the Relationship Between Remote Work, Internet Access, Income, and Aging Across Maryland Counties
+
+@fig-mdFig1 highlights the relationship between internet access and the proportion of residents working from home across Maryland counties in 2019 and 2022, while also incorporating median income and the share of the population aged 65+.
+
+From 2019 to 2022, there is a clear upward shift in the percentage of individuals working from home across nearly all counties. In 2019, most counties cluster between roughly 2% and 7% remote work participation. By 2022, this range increases, with many counties falling between 8% and 15%, and some exceeding 20%. This suggests a widespread expansion of remote work, likely influenced by changes during and after the COVID-19 pandemic.
+
+Across both years, there is a positive association between internet access and remote work. Counties with higher levels of internet access tend to exhibit higher rates of working from home. This relationship becomes more pronounced in 2022, where counties with internet access above 90% consistently show elevated remote work participation. This pattern supports the idea that reliable internet infrastructure is a key enabling factor for remote employment.
+
+Income also appears to play a meaningful role. Higher-income counties (indicated by lighter blue shading) are generally located toward the upper-right portion of the plot, reflecting both higher internet access and higher levels of remote work. This suggests that remote work opportunities may be more accessible in higher-income areas, potentially due to differences in job types, education levels, or industry composition.
+
+The size of the points, representing the percentage of the population aged 65 and older, does not show a strong or consistent relationship with remote work. Counties with larger elderly populations are spread throughout the plot, indicating that age composition alone does not strongly determine remote work participation. However, some counties with older populations still exhibit moderate levels of remote work, suggesting that other factors—such as infrastructure and income—may be more influential.
+
+Overall, @fig-mdFig1 indicates that increases in remote work from 2019 to 2022 are closely associated with higher internet access and higher median income, while the influence of population age 65+ appears less direct.
+
+{{< pagebreak >}}
+
+## Author Contribution:
+
+### Blake Naluai:
+
+- Software
+- Supervision
+- Data curation
+- Visualization
+- Writing: original draft/review & editing
+- Formal analysis
+
+### Raj Ramnani:
+
+- Software
+- Conceptualization
+- Data curation
+- Visualization
+- Writing: original draft/review & editing
+- Formal analysis
 
 {{< pagebreak >}}
 
@@ -103,3 +423,7 @@ For this analysis, we will be using the American Community Survey (ACS) data fro
 #| eval: false
 
 ```
+
+{{< pagebreak >}}
+
+# References:

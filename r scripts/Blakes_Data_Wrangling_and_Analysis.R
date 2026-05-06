@@ -2,12 +2,14 @@
 
 ## Load packages:
 library(tidycensus)
+library(tidyverse)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(knitr)
 library(kableExtra)
 library(scales)
+library(esquisse)
 
 options(tigris_use_cache = TRUE)
 
@@ -118,10 +120,108 @@ md_clean <- md_all |>
   arrange(County, year)
 
 ## Create Data Table
+md_2019_table <- md_clean |>
+  mutate(
+    unemployment_rate = percent(unemployment_rate, accuracy = 0.01),
+    pct_wfh = percent(pct_wfh, accuracy = 0.01),
+    pct_internet = percent(pct_internet, accuracy = 0.01),
+    rent_burden = percent(rent_burden, accuracy = 0.01),
+    pct_65_plus = percent(pct_65_plus, accuracy = 0.01),
+    median_income = dollar(median_income)
+  ) |>
+  filter(
+    year == 2019
+  ) |>
+  select(
+    "Maryland County" = County,
+    "Median Income" = median_income,
+    "% Working From Home" = pct_wfh,
+    "% Households with Internet" = pct_internet,
+    "30%+ Renters Burden" = rent_burden,
+    "% Population 65+" = pct_65_plus,
+    "% Unemployed" = unemployment_rate
+  ) |>
+  kable(
+  caption = "Maryland County Socioeconomic Indicators (2019)"
+  ) |>
+  kable_classic(
+    lightable_options = "striped"
+  )
 
+md_2019_table
+
+md_2022_table <- md_clean |>
+  mutate(
+    unemployment_rate = percent(unemployment_rate, accuracy = 0.01),
+    pct_wfh = percent(pct_wfh, accuracy = 0.01),
+    pct_internet = percent(pct_internet, accuracy = 0.01),
+    rent_burden = percent(rent_burden, accuracy = 0.01),
+    pct_65_plus = percent(pct_65_plus, accuracy = 0.01),
+    median_income = dollar(median_income)
+  ) |>
+  filter(
+    year == 2022
+  ) |>
+  select(
+    "Maryland County" = County,
+    "Median Income" = median_income,
+    "% Working From Home" = pct_wfh,
+    "% Households with Internet" = pct_internet,
+    "30%+ Renters Burden" = rent_burden,
+    "% Population 65+" = pct_65_plus,
+    "% Unemployed" = unemployment_rate
+  ) |>
+  kable(
+    caption = "Maryland County Socioeconomic Indicators (2022)"
+  ) |>
+  kable_classic(
+    lightable_options = "striped"
+  )
+
+md_2022_table
 
 ## Create Data Visualization
+md_visualization <- md_clean |>
+ggplot(
+  mapping = aes(
+    x = pct_internet,
+    y = pct_wfh,
+    size = pct_65_plus,
+    color = median_income
+    )
+  ) +
+  geom_point(alpha = 1) +
+  facet_wrap(~year) +
+  scale_x_continuous(labels = percent_format()) +
+  scale_y_continuous(labels = percent_format()) +
+  labs(
+    title = "Remote Work, Connectivity, Income, and Age Across Maryland Counties",
+    subtitle = "US Census Data from 2019-2022",
+    alt = "Scatter plot showing remote work trends, internet access, income, 
+    and aging in Maryland counties for 2019 and 2022.",
+    x = "% Internet Access",
+    y = "% Working From Home",
+    size = "% Age 65+",
+    color = "Median Income"
+  ) +
+  theme_bw()
 
+# Long Description:
+#' The image is a comparative scatter plot divided into two panels, presenting 
+#' data from 2019 and 2022 on remote work, internet access, income, and aging 
+#' across Maryland counties. Each panel displays county data points represented 
+#' as circles, plotted according to "% Internet Access" on the x-axis and 
+#' "% Working From Home" on the y-axis. The size of each circle indicates the 
+#' percentage of the population aged 65 or older, with larger circles 
+#' representing higher percentages. Color gradients from dark to light blue 
+#' depict median income levels, ranging from 40,000 to 140,000. In 2019, data 
+#' points concentrate at lower working-from-home and internet access percentages, 
+#' while in 2022, the distribution shifts upwards, indicating an increase in 
+#' remote work and internet access. (5/5/2026)
+
+md_visualization
+
+ggsave("test.png")
 
 ## (Optional) Data Analysis/Narrative Text
 
