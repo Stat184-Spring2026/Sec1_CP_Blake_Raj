@@ -65,21 +65,24 @@ wfh_plot <- wfh_avg_plot_data |>
   geom_line(linewidth = 1, na.rm = TRUE) +
   geom_point(size = 3, na.rm = TRUE) +
   scale_x_continuous(
-    breaks = 2018:2023,
-    limits = c(2018, 2023)
+    breaks = 2019:2022,
+    limits = c(2019, 2022)
   ) +
   scale_y_continuous(
     labels = percent_format(accuracy = 1),
     limits = c(0, NA)
   ) +
   labs(
-    title = "Average Work From Home Percentage for Maryland",
     subtitle = "Average percent of workers working from home, ACS 5-year estimates",
     x = "Year",
-    y = "Average percent of workers who worked from home",
-    caption = "Alt text: A line chart showing the average work-from-home percentage across Maryland counties from 2019 through 2022. The line rises over time, showing that work from home became more common during and after the COVID-19 pandemic. Source: U.S. Census Bureau ACS 5-year estimates via tidycensus"
+    y = "% Working from home",
+    caption = "Source: U.S. Census Bureau ACS 5-year estimates via tidycensus"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    plot.subtitle = element_text(hjust = 0.5),
+    panel.border = element_rect(color = "gray60", fill = NA, linewidth = 0.6)
+  )
 
 # Narrative:
 # The work-from-home visualization shows a clear and consistent increase in the

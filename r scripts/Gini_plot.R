@@ -73,11 +73,11 @@ md_gini_change_map <- md_counties |>
 
 ## Create Gini Index change choropleth map
 gini_map <- ggplot(md_gini_change_map) +
-  geom_sf(aes(fill = gini_change), color = "white", linewidth = 0.2) +
+  geom_sf(aes(fill = gini_change), color = "gray50", linewidth = 0.2) +
   scale_fill_gradient2(
-    low = "blue",
-    mid = "white",
-    high = "red",
+    low = "#4575B4",
+    mid = "#F7F7F7",
+    high = "#D73027",
     midpoint = 0,
     labels = label_number(accuracy = 0.001)
   ) +
@@ -85,13 +85,20 @@ gini_map <- ggplot(md_gini_change_map) +
     title = "Change in Income Inequality by Maryland County",
     subtitle = "Gini Index change, ACS 5-year estimates, 2019 to 2022",
     fill = "Gini Index\nchange",
-    caption = "Alt text: A choropleth map of Maryland counties showing change in Gini Index from 2019 to 2022. Counties shaded red had increasing income inequality, counties shaded blue had decreasing income inequality, and lighter counties changed less. Source: U.S. Census Bureau ACS 5-year estimates via tidycensus"
+    caption = "Source: U.S. Census Bureau ACS 5-year estimates via tidycensus"
   ) +
+  
   theme_minimal() +
   theme(
     axis.text = element_blank(),
     axis.title = element_blank(),
-    panel.grid = element_blank()
+    panel.grid = element_blank(),
+    legend.position = "left",
+    plot.caption = element_text(
+      hjust = 0,
+      size = 9,
+      color = "gray40",
+      margin = margin(t = 10))
   )
 
 # Narrative:
