@@ -2,17 +2,16 @@
 title: "CP Analysis Report: US Census Bureau Analysis"
 subtitle: "Stat 184"
 author:
-  - Blake Naluai
-  - Raj Ramnani
+  - name: Blake Naluai
+  - name: Raj Ramnani
 date: "Apr. 24, 2026"
 date-modified: now
-format: pdf
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
-csl: apa7.csl
-bibliography: citations.bib
+format: pdf
+
+# add bib and csl info if needed on quarto document
+# bibliography: temp.bib
+# csl: apa.csl
 ---
 
 {{< pagebreak >}}
@@ -83,50 +82,13 @@ Random sampling survey techniques include:
 
 For this analysis, we will be using the American Community Survey (ACS) data from the US Census Bureau to answer the following question(s):
 
--	How is the rise of remote work associated with income, internet access, and rent burden across Maryland counties from 2019-2022?
--	Are Maryland counties with larger elderly populations (65+) experiencing higher economic strain from 2019-2022?
--	How did Income Inequality change, as measured by the Gini Index, during the periods of 2019-2022?
--	How did the number of people working from home change during the COVID-19 Pandemic?
--	etc.
-
-## FAIR/CARE Principles:
-
-The \{tidycensus\} package and the U.S. Census data it accesses align closely with both the FAIR and CARE principles for responsible data use. In terms of FAIR, the data is highly findable, as each variable is assigned a unique identifier (such as `B19013_001` for median income) and can be easily located using tools like `load_variables()`. It is also accessible, since the Census Bureau provides open access through an API that can be queried directly in R with minimal barriers. The data is inter-operable because it is delivered in consistent, standardized formats that integrate seamlessly with tools in the tidyverse, allowing for efficient data wrangling and analysis. Additionally, it is reusable, as the Census provides thorough documentation and maintains consistent variable definitions across years, enabling reliable longitudinal studies like the 2019–2022 county-level analysis conducted here.
-
-From a CARE perspective, Census data supports collective benefit by being publicly available for research, policy, and social understanding. While individual-level control over data use is limited, the Census Bureau maintains privacy protections, addressing authority to control. Ethical considerations are supported through the use of aggregated, de-identified data, though we must still be mindful when analyzing demographic patterns to avoid harmful generalizations.
-
-## Variables:
-
-The *raw* attributes we will be focusing on for this project are:
-
-- County
-- Year
-- Total population
-- Total households
-- Total renter-occupied households
-- Median household income
-- Labor force (population in labor force)
-- Total workers (commuting / work status)
-- Number of unemployed individuals
-- Number of people working from home
-- Households with internet access
-
-The *constructed/derived* attributes we will be focusing on for this project are:
-
-- Unemployment rate
-- Percentage of workers working from home
-- Percentage of households with internet access
-- Rent burden rate (share of renters spending 30%+ on rent)
-- Percentage of population age 65 and older
-<<<<<<< Updated upstream
-=======
 - How did key demographic and economic indicators (such as population, median income, and employment) change across Maryland between 2019 and 2022?
 - How did population size and density change across counties surrounding St.Marys, MD between 2019 and 2022?
->>>>>>> Stashed changes
 
 {{< pagebreak >}}
 
 ## Data Tables/Visualizations:
+
 
 ```{r}
 #| echo: false
@@ -143,6 +105,8 @@ library(knitr)
 library(kableExtra)
 library(scales)
 library(esquisse)
+library(tigris)
+library(sf)
 
 options(tigris_use_cache = TRUE) # permanently store census shapefiles
 
@@ -342,6 +306,78 @@ md_clean |>
 
 ```
 
+{{< pagebreak >}}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-housing-stress
+#| tbl-cap: "Maryland County Rental Housing Stress Indicators, 2022"
+
+housing_vars <- c(
+  median_gross_rent = "B25064_001",
+  renter_total = "B25070_001",
+  rent_30_34 = "B25070_007",
+  rent_35_39 = "B25070_008",
+  rent_40_49 = "B25070_009",
+  rent_50_plus = "B25070_010",
+  total_housing_units = "B25002_001",
+  vacant_housing_units = "B25002_003"
+)
+
+md_housing_2022 <- get_acs(
+  geography = "county",
+  state = "MD",
+  variables = housing_vars,
+  year = 2022,
+  survey = "acs5",
+  output = "wide"
+) |>
+  transmute(
+    County = str_remove(NAME, ",\\s*.*$"),
+    median_gross_rent = median_gross_rentE,
+    pct_renters_30_plus = (
+      rent_30_34E + rent_35_39E + rent_40_49E + rent_50_plusE
+    ) / renter_totalE,
+    pct_renters_35_plus = (
+      rent_35_39E + rent_40_49E + rent_50_plusE
+    ) / renter_totalE,
+    pct_renters_50_plus = rent_50_plusE / renter_totalE,
+    vacancy_rate = vacant_housing_unitsE / total_housing_unitsE
+  ) |>
+  arrange(County)
+
+md_housing_2022 |>
+  mutate(
+    median_gross_rent = dollar(median_gross_rent),
+    pct_renters_30_plus = percent(pct_renters_30_plus, accuracy = 0.1),
+    pct_renters_35_plus = percent(pct_renters_35_plus, accuracy = 0.1),
+    pct_renters_50_plus = percent(pct_renters_50_plus, accuracy = 0.1),
+    vacancy_rate = percent(vacancy_rate, accuracy = 0.1)
+  ) |>
+  select(
+    "County" = County,
+    "Median Rent" = median_gross_rent,
+    "Renters 30%+" = pct_renters_30_plus,
+    "Renters 35%+" = pct_renters_35_plus,
+    "Renters 50%+" = pct_renters_50_plus,
+    "Vacancy" = vacancy_rate
+  ) |>
+  kable(
+    caption = "Maryland County Rental Housing Stress Indicators, 2022"
+  ) |>
+  kable_classic(
+    lightable_options = "striped"
+  ) |>
+  kable_styling(
+    latex_options = "scale_down",
+    font_size = 9
+  )
+```
+
+{{< pagebreak >}}
+
 ```{r}
 #| echo: false
 #| message: false
@@ -378,9 +414,219 @@ ggplot(
 
 ```
 
+
 Long Description: The image is a comparative scatter plot divided into two panels, presenting data from 2019 and 2022 on remote work, internet access, income, and aging across Maryland counties. Each panel displays county data points represented as circles, plotted according to "% Internet Access" on the x-axis and "% Working From Home" on the y-axis. The size of each circle indicates the percentage of the population aged 65 or older, with larger circles representing higher percentages. Color gradients from dark to light blue depict median income levels, ranging from 40,000 to 140,000. In 2019, data points concentrate at lower working-from-home and internet access percentages, while in 2022, the distribution shifts upwards, indicating an increase in remote work and internet access. We used the tidycensus package [@walker_tidycensus] and {ggplot2} to create this visualization.
 
-(The long description and alt text was produced by ASU-EdPlus-Image-Detail-Tool [@asu] on 5/5/2026)
+  (The long description and alt text was produced by ASU-EdPlus-Image-Detail-Tool [@asu] on 5/5/2026)
+
+{{< pagebreak >}}
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-mdFig2
+#| fig-width: 7
+#| fig-height: 4
+#| fig-pos: H
+#| fig-cap: "Change in Income Inequality by Maryland County"
+#| fig-cap-location: top
+#| fig-alt: ""
+
+## Set variables
+gini_vars <- c(
+  gini_index = "B19083_001"
+)
+
+## Get Gini Index data for 2019
+md_gini_2019 <- get_acs(
+  geography = "county",
+  state = "MD",
+  variables = gini_vars,
+  year = 2019,
+  survey = "acs5",
+  output = "wide"
+) |>
+  mutate(year = 2019)
+
+## Get Gini Index data for 2022
+md_gini_2022 <- get_acs(
+  geography = "county",
+  state = "MD",
+  variables = gini_vars,
+  year = 2022,
+  survey = "acs5",
+  output = "wide"
+) |>
+  mutate(year = 2022)
+
+## Bind and tidy Gini data
+md_gini_clean <- bind_rows(md_gini_2019, md_gini_2022) |>
+  transmute(
+    GEOID,
+    County = NAME,
+    year,
+    gini_index = gini_indexE
+  )
+
+## Calculate county-level Gini Index change
+md_gini_change <- md_gini_clean |>
+  pivot_wider(
+    names_from = year,
+    values_from = gini_index,
+    names_prefix = "gini_"
+  ) |>
+  mutate(
+    gini_change = gini_2022 - gini_2019
+  )
+
+## Get Maryland county map boundaries
+md_counties <- counties(state = "MD", cb = TRUE, year = 2022) |>
+  st_as_sf()
+
+## Join Gini change data to county map boundaries
+md_gini_change_map <- md_counties |>
+  left_join(md_gini_change, by = "GEOID")
+
+## Create Gini Index change choropleth map
+ggplot(md_gini_change_map) +
+  geom_sf(aes(fill = gini_change), color = "gray50", linewidth = 0.2) +
+  scale_fill_gradient2(
+    low = "#4575B4",
+    mid = "#F7F7F7",
+    high = "#D73027",
+    midpoint = 0,
+    labels = label_number(accuracy = 0.001)
+  ) +
+  labs(
+    subtitle = "Gini Index change, ACS 5-year estimates, 2019 to 2022",
+    fill = "Gini Index\nchange",
+    caption = "Source: U.S. Census Bureau ACS 5-year estimates via tidycensus"
+  ) +
+  
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "left",
+    plot.subtitle = element_text(hjust = 0.25),
+  )
+
+# Narrative:
+# The Gini Index map shows that income inequality changed unevenly across Maryland
+# counties from 2019 to 2022. Most counties show only very small changes, suggesting
+# that income inequality was relatively stable overall. Taken together, the statewide
+# pattern appears to show a slight net reduction in income inequality, but the change
+# is not evenly distributed across counties.
+
+```
+
+Long Description: The image is a choropleth map showing the change in income inequality across Maryland counties between 2019 and 2022. Each county is shaded according to its change in Gini Index value, using a diverging color scale centered at zero. Blue shades represent counties where the Gini Index decreased, indicating a decline in income inequality, while red shades represent counties where the Gini Index increased, indicating a rise in income inequality. Counties shaded closer to white experienced little or no change during the period.
+
+The map includes subtle county boundaries to distinguish individual counties while keeping the focus on the overall geographic pattern. The legend shows the numerical range of Gini Index change. Overall, the visualization shows that changes in income inequality were not uniform across Maryland; some counties experienced increases, while others experienced decreases or minimal change. 
+
+(The long description and alt text was produced by ASU-EdPlus-Image-Detail-Tool [@asu] on 5/6/2026)
+
+{{< pagebreak >}}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-mdFig3
+#| fig-width: 7
+#| fig-height: 4
+#| fig-pos: H
+#| fig-cap: "Average Work From Home Percentage for Maryland"
+#| fig-cap-location: top
+#| fig-alt: ""
+
+## Set variables
+wfh_vars <- c(
+  total_workers = "B08301_001",
+  work_from_home = "B08301_021"
+)
+
+## Get work-from-home data for each year
+years <- 2019:2022
+
+md_wfh_all <- map_dfr(years, \(yr) {
+  get_acs(
+    geography = "county",
+    state = "MD",
+    variables = wfh_vars,
+    year = yr,
+    survey = "acs5",
+    output = "wide"
+  ) |>
+    mutate(year = yr)
+})
+
+## Tidy work-from-home data
+md_wfh_clean <- md_wfh_all |>
+  transmute(
+    GEOID,
+    County = NAME,
+    year,
+    total_workers = total_workersE,
+    work_from_home = work_from_homeE,
+    pct_wfh = work_from_home / total_workers
+  )
+
+## Calculate average work-from-home percentage across Maryland counties
+wfh_avg <- md_wfh_clean |>
+  group_by(year) |>
+  summarise(
+    avg_pct_wfh = mean(pct_wfh, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+## Add 2018 and 2023 to the axis without plotting values for those years
+wfh_avg_plot_data <- tibble(
+  year = 2018:2023
+) |>
+  left_join(wfh_avg, by = "year")
+
+## Create work-from-home line plot
+wfh_plot <- wfh_avg_plot_data |>
+  ggplot(aes(x = year, y = avg_pct_wfh)) +
+  geom_line(linewidth = 1, na.rm = TRUE) +
+  geom_point(size = 3, na.rm = TRUE) +
+  scale_x_continuous(
+    breaks = 2019:2022,
+    limits = c(2019, 2022)
+  ) +
+  scale_y_continuous(
+    labels = percent_format(accuracy = 1),
+    limits = c(0, NA)
+  ) +
+  labs(
+    x = "Year",
+    y = "% Working from home",
+    caption = "Source: U.S. Census Bureau ACS 5-year estimates via tidycensus"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.subtitle = element_text(hjust = 0.5),
+    panel.border = element_rect(color = "gray60", fill = NA, linewidth = 0.6)
+  )
+
+# Narrative:
+# The work-from-home visualization shows a clear and consistent increase in the
+# average share of Maryland county workers working from home from 2019 through 2022.
+# This shows that remote work became much more common during this period,
+# reflecting major world-wide changes consistent with the social distancing requirements.
+wfh_plot
+```
+
+Long Description: The image is a line chart showing the average percentage of workers working from home across Maryland counties from 2019 to 2022. The x-axis represents year, with points shown for 2019, 2020, 2021, and 2022. The y-axis represents the average percentage of workers who worked from home, ranging from 0% to 12%. Each year is represented by a black circular point, and the points are connected by a black line to show the trend over time.
+
+The chart shows a steady increase in the average work-from-home percentage across Maryland counties during this period. In 2019, the average percentage was slightly above 5%. By 2020, it increased to about 7%, then rose further to nearly 10% in 2021. By 2022, the average reached almost 12%. This upward trend suggests that working from home became increasingly common during and after the COVID-19 pandemic. 
+
+(The long description and alt text was produced by ASU-EdPlus-Image-Detail-Tool [@asu] on 5/6/2026)
+
 
 {{< pagebreak >}}
 
@@ -399,6 +645,22 @@ Income also appears to play a meaningful role. Higher-income counties (indicated
 The size of the points, representing the percentage of the population aged 65 and older, does not show a strong or consistent relationship with remote work. Counties with larger elderly populations are spread throughout the plot, indicating that age composition alone does not strongly determine remote work participation. However, some counties with older populations still exhibit moderate levels of remote work, suggesting that other factors—such as infrastructure and income—may be more influential.
 
 Overall, @fig-mdFig1 indicates that increases in remote work from 2019 to 2022 are closely associated with higher internet access and higher median income, while the influence of population age 65+ appears less direct.
+
+#### Exploring Changes in Income Inequality Across Maryland Counties
+
+@fig-mdFig2 shows that income inequality changed unevenly across Maryland counties from 2019 to 2022. Some counties experienced small increases in the Gini Index, while others experienced small decreases. However, most changes appear modest, suggesting that income inequality remained relatively stable across much of the state.
+
+This goes against our expectation that income inequality would show a significant change after COVID-19. Given the major disruptions to work, income, housing, and household conditions during this period, we expected the Gini Index to shift more noticeably. Instead, the map suggests that any changes in inequality were relatively limited and varied by county.
+
+Overall, @fig-mdFig2 suggests that income inequality shifted slightly across Maryland counties, but there was no dramatic statewide increase or decrease.
+
+#### Examining the Change in Working From Home in Maryland Counties
+
+@fig-mdFig3 shows a clear increase in the average percentage of workers working from home across Maryland counties from 2019 to 2022. The average begins slightly above 5% in 2019 and rises steadily, reaching almost 12% by 2022.
+
+This increase likely reflects the impact of the COVID-19 pandemic and the longer-term shift toward remote work. The continued rise through 2022 suggests that working from home became more established rather than simply returning to pre-pandemic levels.
+
+Overall, @fig-mdFig3 supports the broader finding that remote work expanded substantially across Maryland during this period.
 
 {{< pagebreak >}}
 
@@ -422,6 +684,7 @@ Overall, @fig-mdFig1 indicates that increases in remote work from 2019 to 2022 a
 - Writing: original draft/review & editing
 - Formal analysis
 
+
 {{< pagebreak >}}
 
 ## Code Appendix
@@ -433,13 +696,6 @@ Overall, @fig-mdFig1 indicates that increases in remote work from 2019 to 2022 a
 
 ```
 
-<<<<<<< Updated upstream
 {{< pagebreak >}}
 
-# References:
-=======
-
-{{< pagebreak >}}
-
-# References:
->>>>>>> Stashed changes
+## References:
