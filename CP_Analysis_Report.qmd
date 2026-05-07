@@ -316,6 +316,7 @@ md_clean |>
 #| tbl-cap: "Maryland County Socioeconomic Indicators (2022)"
 
 # ---- Author: Blake Naluai ----
+# ---- Reviewer: Blake Naluai & Raj Ramnani ----
 
 md_clean |>
   mutate(
