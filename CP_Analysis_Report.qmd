@@ -122,6 +122,8 @@ The *constructed/derived* attributes we will be focusing on for this project are
 #| message: false
 #| warning: false
 
+# Coding Style: tidyverse
+
 # ---- Author: Blake Naluai ----
 # ---- Reviewer: Blake Naluai & Raj Ramnani ----
 
