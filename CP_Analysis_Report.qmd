@@ -123,6 +123,7 @@ The *constructed/derived* attributes we will be focusing on for this project are
 #| warning: false
 
 # ---- Author: Blake Naluai ----
+# ---- Reviewer: Blake Naluai & Raj Ramnani ----
 
 # Load Packages and API key
 library(tidycensus)
@@ -155,6 +156,7 @@ invisible(census_api_key(
 #| label: wrangleMDData1
 
 # ---- Author: Blake Naluai ----
+# ---- Reviewer: Blake Naluai & Raj Ramnani ----
 
 ## Set variables
 vars <- c(
@@ -270,6 +272,7 @@ md_clean <- md_all |>
 #| tbl-cap: "Maryland County Socioeconomic Indicators (2019)"
 
 # ---- Author: Blake Naluai ----
+# ---- Reviewer: Blake Naluai & Raj Ramnani ----
 
 md_clean |>
   mutate(
@@ -361,6 +364,7 @@ md_clean |>
 #| fig-alt: "Scatter plot showing remote work trends, internet access, income, and aging in Maryland counties for 2019 and 2022."
 
 # ---- Author: Blake Naluai ----
+# ---- Reviewer: Blake Naluai & Raj Ramnani ----
 
 md_clean |>
 ggplot(
@@ -412,6 +416,7 @@ Overall, @fig-mdFig1 indicates that increases in remote work from 2019 to 2022 a
 #| tbl-cap: "Maryland County Rental Housing Stress Indicators, 2022"
 
 # ---- Author: Raj Ramnani ----
+# ---- Reviewer: Blake Naluai & Raj Ramnani ----
 
 housing_vars <- c(
   median_gross_rent = "B25064_001",
@@ -487,6 +492,7 @@ md_housing_2022 |>
 #| fig-alt: "A choropleth map of Maryland counties showing change in Gini Index from 2019 to 2022. Counties shaded red had increasing income inequality, counties shaded blue had decreasing income inequality, and lighter counties changed less."
 
 # ---- Author: Raj Ramnani ----
+# ---- Reviewer: Blake Naluai & Raj Ramnani ----
 
 ## Set variables
 gini_vars <- c(
@@ -604,6 +610,7 @@ Overall, @fig-mdFig2 suggests that income inequality shifted slightly across Mar
 #| fig-alt: "A line chart showing the average work-from-home percentage across Maryland counties from 2019 through 2022. The line rises over time, showing that work from home became more common during and after the COVID-19 pandemic."
 
 # ---- Author: Raj Ramnani ----
+# ---- Reviewer: Blake Naluai & Raj Ramnani ----
 
 ## Set variables
 wfh_vars <- c(
