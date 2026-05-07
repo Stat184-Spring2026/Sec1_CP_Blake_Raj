@@ -78,6 +78,7 @@ Random sampling survey techniques include:
 - Data is released as 1-year estimates (large populations) or 5-year estimates (smaller, more reliable populations)
 
 For this analysis, we will be using the American Community Survey (ACS) data from the US Census Bureau to answer the following question(s):
+
 -	How is the rise of remote work associated with income, internet access, and rent burden across Maryland counties from 2019-2022?
 -	Are Maryland counties with larger elderly populations (65+) experiencing higher economic strain from 2019-2022?
 -	How did Income Inequality change, as measured by the Gini Index, during the periods of 2019-2022?
@@ -113,18 +114,15 @@ The *constructed/derived* attributes we will be focusing on for this project are
 - Percentage of households with internet access
 - Rent burden rate (share of renters spending 30%+ on rent)
 - Percentage of population age 65 and older
-- How did key demographic and economic indicators (such as population, median income, and employment) change across Maryland between 2019 and 2022?
-- How did population size and density change across counties surrounding St.Marys, MD between 2019 and 2022?
 
 {{< pagebreak >}}
-
-## Data Tables/Visualizations:
-
 
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
+
+# ---- Author: Blake Naluai ----
 
 # Load Packages and API key
 library(tidycensus)
@@ -152,6 +150,8 @@ invisible(census_api_key("6377fd44a462d589653004510dcef417f2f8aabb",
 #| message: false
 #| warning: false
 #| label: wrangleMDData1
+
+# ---- Author: Blake Naluai ----
 
 ## Set variables
 vars <- c(
@@ -253,12 +253,20 @@ md_clean <- md_all |>
 
 ```
 
+{{< pagebreak >}}
+
+## Data Analysis:
+
+#### Exploring the Relationship Between Remote Work, Internet Access, Income, and Aging Across Maryland Counties:
+
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
 #| label: tbl-md2019Table1
 #| tbl-cap: "Maryland County Socioeconomic Indicators (2019)"
+
+# ---- Author: Blake Naluai ----
 
 md_clean |>
   mutate(
@@ -294,14 +302,14 @@ md_clean |>
 
 ```
 
-{{< pagebreak >}}
-
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
 #| label: tbl-md2022Table1
 #| tbl-cap: "Maryland County Socioeconomic Indicators (2022)"
+
+# ---- Author: Blake Naluai ----
 
 md_clean |>
   mutate(
@@ -337,7 +345,61 @@ md_clean |>
 
 ```
 
-{{< pagebreak >}}
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-mdFig1
+#| fig-width: 7
+#| fig-height: 4
+#| fig-pos: H
+#| fig-cap: "Remote Work, Connectivity, Income, and Age Across Maryland Counties"
+#| fig-cap-location: top
+#| fig-alt: "Scatter plot showing remote work trends, internet access, income, and aging in Maryland counties for 2019 and 2022."
+
+# ---- Author: Blake Naluai ----
+
+md_clean |>
+ggplot(
+  mapping = aes(
+    x = pct_internet,
+    y = pct_wfh,
+    size = pct_65_plus,
+    color = median_income
+    )
+  ) +
+  geom_point(alpha = 1) +
+  facet_wrap(~year) +
+  scale_x_continuous(labels = percent_format()) +
+  scale_y_continuous(labels = percent_format()) +
+  labs(
+    caption = "U.S. Census Bureau ACS 5−year estimates via tidycensus",
+    x = "% Internet Access",
+    y = "% Working From Home",
+    size = "% Age 65+",
+    color = "Median Income"
+  ) +
+  theme_bw()
+
+```
+
+**Long Description:** The image is a comparative scatter plot divided into two panels, presenting data from 2019 and 2022 on remote work, internet access, income, and aging across Maryland counties. Each panel displays county data points represented as circles, plotted according to "% Internet Access" on the x-axis and "% Working From Home" on the y-axis. The size of each circle indicates the percentage of the population aged 65 or older, with larger circles representing higher percentages. Color gradients from dark to light blue depict median income levels, ranging from 40,000 to 140,000. In 2019, data points concentrate at lower working-from-home and internet access percentages, while in 2022, the distribution shifts upwards, indicating an increase in remote work and internet access. We used the tidycensus package [@walker_tidycensus] and {ggplot2} to create this visualization.
+
+(The long description and alt text was produced by ASU-EdPlus-Image-Detail-Tool [@asu] on 5/5/2026)
+
+@fig-mdFig1 highlights the relationship between internet access and the proportion of residents working from home across Maryland counties in 2019 and 2022, while also incorporating median income and the share of the population aged 65+. (The data within @fig-mdFig1 was created with data from @tbl-md2019Table1 and @tbl-md2022Table1, look that them for additional information).
+
+From 2019 to 2022, there is a clear upward shift in the percentage of individuals working from home across nearly all counties. In 2019, most counties cluster between roughly 2% and 7% remote work participation. By 2022, this range increases, with many counties falling between 8% and 15%, and some exceeding 20%. This suggests a widespread expansion of remote work, likely influenced by changes during and after the COVID-19 pandemic.
+
+Across both years, there is a positive association between internet access and remote work. Counties with higher levels of internet access tend to exhibit higher rates of working from home. This relationship becomes more pronounced in 2022, where counties with internet access above 90% consistently show elevated remote work participation. This pattern supports the idea that reliable internet infrastructure is a key enabling factor for remote employment.
+
+Income also appears to play a meaningful role. Higher-income counties (indicated by lighter blue shading) are generally located toward the upper-right portion of the plot, reflecting both higher internet access and higher levels of remote work. This suggests that remote work opportunities may be more accessible in higher-income areas, potentially due to differences in job types, education levels, or industry composition.
+
+The size of the points, representing the percentage of the population aged 65 and older, does not show a strong or consistent relationship with remote work. Counties with larger elderly populations are spread throughout the plot, indicating that age composition alone does not strongly determine remote work participation. However, some counties with older populations still exhibit moderate levels of remote work, suggesting that other factors—such as infrastructure and income—may be more influential.
+
+Overall, @fig-mdFig1 indicates that increases in remote work from 2019 to 2022 are closely associated with higher internet access and higher median income, while the influence of population age 65+ appears less direct.
+
+#### Exploring Changes in Income Inequality Across Maryland Counties:
 
 ```{r}
 #| echo: false
@@ -345,6 +407,8 @@ md_clean |>
 #| warning: false
 #| label: tbl-housing-stress
 #| tbl-cap: "Maryland County Rental Housing Stress Indicators, 2022"
+
+# ---- Author: Raj Ramnani ----
 
 housing_vars <- c(
   median_gross_rent = "B25064_001",
@@ -407,52 +471,6 @@ md_housing_2022 |>
   )
 ```
 
-{{< pagebreak >}}
-
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-mdFig1
-#| fig-width: 7
-#| fig-height: 4
-#| fig-pos: H
-#| fig-cap: "Remote Work, Connectivity, Income, and Age Across Maryland Counties"
-#| fig-cap-location: top
-#| fig-alt: "Scatter plot showing remote work trends, internet access, income, and aging in Maryland counties for 2019 and 2022."
-
-md_clean |>
-ggplot(
-  mapping = aes(
-    x = pct_internet,
-    y = pct_wfh,
-    size = pct_65_plus,
-    color = median_income
-    )
-  ) +
-  geom_point(alpha = 1) +
-  facet_wrap(~year) +
-  scale_x_continuous(labels = percent_format()) +
-  scale_y_continuous(labels = percent_format()) +
-  labs(
-    caption = "US Census Data from 2019-2022",
-    x = "% Internet Access",
-    y = "% Working From Home",
-    size = "% Age 65+",
-    color = "Median Income"
-  ) +
-  theme_bw()
-
-```
-
-
-Long Description: The image is a comparative scatter plot divided into two panels, presenting data from 2019 and 2022 on remote work, internet access, income, and aging across Maryland counties. Each panel displays county data points represented as circles, plotted according to "% Internet Access" on the x-axis and "% Working From Home" on the y-axis. The size of each circle indicates the percentage of the population aged 65 or older, with larger circles representing higher percentages. Color gradients from dark to light blue depict median income levels, ranging from 40,000 to 140,000. In 2019, data points concentrate at lower working-from-home and internet access percentages, while in 2022, the distribution shifts upwards, indicating an increase in remote work and internet access. We used the tidycensus package [@walker_tidycensus] and {ggplot2} to create this visualization.
-
-  (The long description and alt text was produced by ASU-EdPlus-Image-Detail-Tool [@asu] on 5/5/2026)
-
-{{< pagebreak >}}
-
-
 ```{r}
 #| echo: false
 #| message: false
@@ -464,6 +482,8 @@ Long Description: The image is a comparative scatter plot divided into two panel
 #| fig-cap: "Change in Income Inequality by Maryland County"
 #| fig-cap-location: top
 #| fig-alt: "A choropleth map of Maryland counties showing change in Gini Index from 2019 to 2022. Counties shaded red had increasing income inequality, counties shaded blue had decreasing income inequality, and lighter counties changed less."
+
+# ---- Author: Raj Ramnani ----
 
 ## Set variables
 gini_vars <- c(
@@ -560,7 +580,13 @@ The map includes subtle county boundaries to distinguish individual counties whi
 
 (The long description and alt text was produced by ASU-EdPlus-Image-Detail-Tool [@asu] on 5/6/2026)
 
-{{< pagebreak >}}
+@fig-mdFig2 shows that income inequality changed unevenly across Maryland counties from 2019 to 2022. Some counties experienced small increases in the Gini Index, while others experienced small decreases. However, most changes appear modest, suggesting that income inequality remained relatively stable across much of the state.
+
+This goes against our expectation that income inequality would show a significant change after COVID-19. Given the major disruptions to work, income, housing, and household conditions during this period, we expected the Gini Index to shift more noticeably. Instead, the map suggests that any changes in inequality were relatively limited and varied by county.
+
+Overall, @fig-mdFig2 suggests that income inequality shifted slightly across Maryland counties, but there was no dramatic statewide increase or decrease.
+
+#### Examining the Change in Working From Home in Maryland Counties:
 
 ```{r}
 #| echo: false
@@ -573,6 +599,8 @@ The map includes subtle county boundaries to distinguish individual counties whi
 #| fig-cap: "Average Work From Home Percentage for Maryland"
 #| fig-cap-location: top
 #| fig-alt: "A line chart showing the average work-from-home percentage across Maryland counties from 2019 through 2022. The line rises over time, showing that work from home became more common during and after the COVID-19 pandemic."
+
+# ---- Author: Raj Ramnani ----
 
 ## Set variables
 wfh_vars <- c(
@@ -657,35 +685,6 @@ Long Description: The image is a line chart showing the average percentage of wo
 The chart shows a steady increase in the average work-from-home percentage across Maryland counties during this period. In 2019, the average percentage was slightly above 5%. By 2020, it increased to about 7%, then rose further to nearly 10% in 2021. By 2022, the average reached almost 12%. This upward trend suggests that working from home became increasingly common during and after the COVID-19 pandemic. 
 
 (The long description and alt text was produced by ASU-EdPlus-Image-Detail-Tool [@asu] on 5/6/2026)
-
-
-{{< pagebreak >}}
-
-## Data Analysis:
-
-#### Exploring the Relationship Between Remote Work, Internet Access, Income, and Aging Across Maryland Counties
-
-@fig-mdFig1 highlights the relationship between internet access and the proportion of residents working from home across Maryland counties in 2019 and 2022, while also incorporating median income and the share of the population aged 65+.
-
-From 2019 to 2022, there is a clear upward shift in the percentage of individuals working from home across nearly all counties. In 2019, most counties cluster between roughly 2% and 7% remote work participation. By 2022, this range increases, with many counties falling between 8% and 15%, and some exceeding 20%. This suggests a widespread expansion of remote work, likely influenced by changes during and after the COVID-19 pandemic.
-
-Across both years, there is a positive association between internet access and remote work. Counties with higher levels of internet access tend to exhibit higher rates of working from home. This relationship becomes more pronounced in 2022, where counties with internet access above 90% consistently show elevated remote work participation. This pattern supports the idea that reliable internet infrastructure is a key enabling factor for remote employment.
-
-Income also appears to play a meaningful role. Higher-income counties (indicated by lighter blue shading) are generally located toward the upper-right portion of the plot, reflecting both higher internet access and higher levels of remote work. This suggests that remote work opportunities may be more accessible in higher-income areas, potentially due to differences in job types, education levels, or industry composition.
-
-The size of the points, representing the percentage of the population aged 65 and older, does not show a strong or consistent relationship with remote work. Counties with larger elderly populations are spread throughout the plot, indicating that age composition alone does not strongly determine remote work participation. However, some counties with older populations still exhibit moderate levels of remote work, suggesting that other factors—such as infrastructure and income—may be more influential.
-
-Overall, @fig-mdFig1 indicates that increases in remote work from 2019 to 2022 are closely associated with higher internet access and higher median income, while the influence of population age 65+ appears less direct.
-
-#### Exploring Changes in Income Inequality Across Maryland Counties
-
-@fig-mdFig2 shows that income inequality changed unevenly across Maryland counties from 2019 to 2022. Some counties experienced small increases in the Gini Index, while others experienced small decreases. However, most changes appear modest, suggesting that income inequality remained relatively stable across much of the state.
-
-This goes against our expectation that income inequality would show a significant change after COVID-19. Given the major disruptions to work, income, housing, and household conditions during this period, we expected the Gini Index to shift more noticeably. Instead, the map suggests that any changes in inequality were relatively limited and varied by county.
-
-Overall, @fig-mdFig2 suggests that income inequality shifted slightly across Maryland counties, but there was no dramatic statewide increase or decrease.
-
-#### Examining the Change in Working From Home in Maryland Counties
 
 @fig-mdFig3 shows a clear increase in the average percentage of workers working from home across Maryland counties from 2019 to 2022. The average begins slightly above 5% in 2019 and rises steadily, reaching almost 12% by 2022.
 
