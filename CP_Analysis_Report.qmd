@@ -140,8 +140,11 @@ library(sf)
 options(tigris_use_cache = TRUE) # permanently store census shapefiles
 
 ## Set the Census API key
-invisible(census_api_key("6377fd44a462d589653004510dcef417f2f8aabb", 
-                         overwrite = TRUE, install = TRUE))
+invisible(census_api_key(
+  "6377fd44a462d589653004510dcef417f2f8aabb",
+  overwrite = TRUE,
+  install = TRUE
+  ))
 
 ```
 
